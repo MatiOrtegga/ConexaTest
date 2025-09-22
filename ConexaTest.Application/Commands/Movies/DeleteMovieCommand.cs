@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using ErrorOr;
+using MediatR;
 namespace ConexaTest.Application.Commands.Movies
 {
-    internal class DeleteMovieCommand
+    public class DeleteMovieCommand : IRequest<ErrorOr<bool>>
     {
+        public int Id { get; set; }
     }
 }
