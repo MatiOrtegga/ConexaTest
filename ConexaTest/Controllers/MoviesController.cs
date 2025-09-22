@@ -1,6 +1,7 @@
 ﻿using ConexaTest.Application.Commands.Movies;
 using ConexaTest.Application.Queries.Movies;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace ConexaTest.Controllers
 {
@@ -8,7 +9,8 @@ namespace ConexaTest.Controllers
     [ApiController]
     public class MoviesController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
+        private readonly IMediator _mediator = mediator;        
+        [AllowAnonymous]
         [HttpGet] 
         public async Task<IResult> GetMoviesAsync()
         {
@@ -26,7 +28,7 @@ namespace ConexaTest.Controllers
 
             return Results.Ok(query.Value);
         }
-
+        [Authorize(Roles = "User,Admin")]
         [HttpGet("{id}")]
         public async Task<IResult> GetMovieByIdAsync(int id) 
         {
@@ -42,7 +44,7 @@ namespace ConexaTest.Controllers
 
             return Results.Ok(query.Value);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost] 
         public async Task<IResult> AddMovieAsync([FromBody] AddMovieCommand command)
         {
@@ -54,7 +56,7 @@ namespace ConexaTest.Controllers
 
             return Results.Ok("Movie added succesfully.");
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("sync-swapi")] 
         public async Task<IResult> SyncSwapiMoviesAsync()
         {
@@ -66,7 +68,7 @@ namespace ConexaTest.Controllers
 
             return Results.Ok("Movies Sincronized succesfully.");
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IResult> UpdateMovieAsync([FromBody] UpdateMovieCommand command)
         {
@@ -77,7 +79,7 @@ namespace ConexaTest.Controllers
             }
             return Results.Ok("Movie updated succesfully.");
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IResult> DeleteMovieAsync(int id)
         {

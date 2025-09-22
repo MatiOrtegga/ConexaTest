@@ -1,6 +1,0 @@
-@ConexaTest_HostAddress = http://localhost:5211
-
-GET {{ConexaTest_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
