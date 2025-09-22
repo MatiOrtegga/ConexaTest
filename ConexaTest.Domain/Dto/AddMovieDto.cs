@@ -1,6 +1,6 @@
 ﻿namespace ConexaTest.Domain.Dto
 {
-    public class MovieDto
+    public class AddMovieDto
     {
         public string ExternalId { get; set; } = "";
         public string Source { get; set; } = "Local";

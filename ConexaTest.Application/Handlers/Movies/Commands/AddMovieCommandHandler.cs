@@ -1,5 +1,6 @@
 ﻿using ConexaTest.Application.Builders;
 using ConexaTest.Application.Commands.Movies;
+using ConexaTest.Domain.Errors.Movies;
 using ConexaTest.Infrastructure;
 using ErrorOr;
 using MediatR;
@@ -18,12 +19,20 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
                 .Build();
                 ;
 
-            await _dbContext.Movies.AddAsync(movie,cancellationToken);
+            var movieWithSameTitle = _dbContext.Movies
+                .FirstOrDefault(m => m.Title == request.Title);
+
+            if(movieWithSameTitle is not null)
+            {
+                return MoviesError.MovieAlreadyExists;
+            }
+
+                await _dbContext.Movies.AddAsync(movie,cancellationToken);
             var response = await _dbContext.SaveChangesAsync(cancellationToken);
 
             if(response == 0)
             {
-                return Error.Failure(description: "Failed to add movie");
+                return MoviesError.CantAddMovie;
             }
 
             return true;

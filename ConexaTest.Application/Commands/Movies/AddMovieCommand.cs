@@ -4,7 +4,7 @@ using MediatR;
 
 namespace ConexaTest.Application.Commands.Movies
 {
-    public class AddMovieCommand : MovieDto, IRequest<ErrorOr<bool>>
+    public class AddMovieCommand : AddMovieDto, IRequest<ErrorOr<bool>>
     {        
     }
 }

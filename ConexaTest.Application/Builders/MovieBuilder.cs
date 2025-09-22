@@ -16,6 +16,11 @@ namespace ConexaTest.Application.Builders
                 Producer = Producer
             };
         }
+        public MovieBuilder SetId(int id)
+        {
+            Movie.Id = id;
+            return this;
+        }
         public MovieBuilder SetExternalId(string externalId)
         {
             Movie.ExternalId = externalId;
