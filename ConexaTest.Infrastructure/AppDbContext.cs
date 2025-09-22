@@ -42,10 +42,10 @@ namespace ConexaTest.Infrastructure
                       .HasMaxLength(100);
 
                 entity.Property(m => m.CreatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.Property(m => m.UpdatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -59,7 +59,7 @@ namespace ConexaTest.Infrastructure
                       .HasMaxLength(50);
 
                 entity.Property(r => r.CreatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -81,7 +81,7 @@ namespace ConexaTest.Infrastructure
                       .HasMaxLength(255);
 
                 entity.Property(u => u.CreatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(u => u.Role)
                       .WithMany()

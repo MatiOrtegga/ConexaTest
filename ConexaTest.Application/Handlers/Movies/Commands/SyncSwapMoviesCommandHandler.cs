@@ -26,7 +26,7 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
                     var movie = new MovieBuilder(swapiMovie.Properties.Title, swapiMovie.Properties.Director, swapiMovie.Properties.Producer)
                         .SetExternalId(swapiMovie.Id)
                         .SetSource("SWAPI")
-                        .SetReleaseDate(DateTime.Parse(swapiMovie.Properties.ReleaseDate))
+                        .SetReleaseDate(DateTime.SpecifyKind(DateTime.Parse(swapiMovie.Properties.ReleaseDate), DateTimeKind.Utc))
                         .SetDescription(swapiMovie.Description)
                         .SetEpisodeId(swapiMovie.Properties.EpisodeId)
                         .Build();

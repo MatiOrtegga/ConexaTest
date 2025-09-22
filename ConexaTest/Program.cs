@@ -36,9 +36,10 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Ad
 builder.Services.AddScoped<SwapiServices>();
 builder.Services.AddScoped<JwtUtils>();
 builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaDb"));
-});
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("ConexaDb")
+    )
+);
 
 var app = builder.Build();
 
