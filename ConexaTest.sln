@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConexaTest", "ConexaTest\ConexaTest.csproj", "{DF3BB7EE-CEE6-4A7A-A09D-6231FD2175F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF3BB7EE-CEE6-4A7A-A09D-6231FD2175F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF3BB7EE-CEE6-4A7A-A09D-6231FD2175F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF3BB7EE-CEE6-4A7A-A09D-6231FD2175F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF3BB7EE-CEE6-4A7A-A09D-6231FD2175F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A42E556C-4B01-4C28-A8BC-B8A078048E0F}
+	EndGlobalSection
+EndGlobal
