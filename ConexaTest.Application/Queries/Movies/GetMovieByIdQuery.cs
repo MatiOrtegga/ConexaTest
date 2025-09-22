@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ConexaTest.Domain.Models;
+using ErrorOr;
+using MediatR;
+
 
 namespace ConexaTest.Application.Queries.Movies
 {
-    internal class GetMovieByIdQuery
+    public class GetMovieByIdQuery : IRequest<ErrorOr<Movie>>
     {
+        public int Id { get; set; }
     }
 }
