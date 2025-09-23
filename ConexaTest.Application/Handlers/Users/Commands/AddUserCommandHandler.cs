@@ -13,15 +13,12 @@ namespace ConexaTest.Application.Handlers.Users.Commands
         private readonly AppDbContext _dbContext = dbContext;
         public async Task<ErrorOr<bool>> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
-            var userWithSameEmail = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+            var userWithSameEmail = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower(), cancellationToken);
             if (userWithSameEmail != null)
             {
                 return UserErrors.EmailAlreadyInUse;
             }
-            if (request.RoleId == 0)
-            {
-                return UserErrors.RoleNotFound;
-            }
+            
             var newUser = new User
             {
                 Name = request.Name,

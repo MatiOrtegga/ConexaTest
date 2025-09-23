@@ -1,15 +1,33 @@
-﻿using ConexaTest.Application.Commands.Movies;
+﻿using AutoMapper;
+using ConexaTest.Application.Commands.Movies;
+using ConexaTest.Application.Commands.Users;
 using ConexaTest.Application.Handlers.Movies.Commands;
 using ConexaTest.Application.Handlers.Movies.Queries;
 using ConexaTest.Application.Queries.Movies;
+using ConexaTest.Domain.Dto;
 using ConexaTest.Domain.Errors.Movies;
 using ConexaTest.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace ConexaTest.Tests.ApplicationTests
 {
     public class MoviesServiceTests
     {
+        private IMapper _mapper;
+        private MapperConfiguration _config;
+
+        public MoviesServiceTests()
+        {
+            _config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Movie, AddMovieDto>().ReverseMap();
+                cfg.CreateMap<Movie, UpdateMovieDto>().ReverseMap();
+                cfg.CreateMap<AddUserCommand, User>().ReverseMap();
+            }, new NullLoggerFactory());
+            _mapper = _config.CreateMapper();
+        }
         [Fact]
         public async Task GetAllMovies_WhenMovieExists_ReturnAllMovies()
         {
@@ -94,7 +112,7 @@ namespace ConexaTest.Tests.ApplicationTests
         public async Task AddMovie_WhenMovieTitleAlreadyExits_ReturnsError()
         {
             var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
-            var handler = new AddMovieCommandHandler(fakeDbContext);
+            var handler = new AddMovieCommandHandler(fakeDbContext, _mapper);
 
             var movie = new Movie
             {
@@ -128,7 +146,7 @@ namespace ConexaTest.Tests.ApplicationTests
         public async Task AddMovie_NewMovie_ReturnsTrue()
         {
             var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
-            var handler = new AddMovieCommandHandler(fakeDbContext);
+            var handler = new AddMovieCommandHandler(fakeDbContext, _mapper);
 
             var command = new AddMovieCommand
             {
@@ -146,17 +164,15 @@ namespace ConexaTest.Tests.ApplicationTests
             Assert.False(result.IsError);
             Assert.True(result.Value);
         }
-
         [Fact]
         public async Task UpdateMovie_WithMovieIdInexistent_ReturnsError()
         {
             var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
-            var handler = new UpdateMovieCommandHandler(fakeDbContext);
+            var handler = new UpdateMovieCommandHandler(fakeDbContext, _mapper);
 
             var command = new UpdateMovieCommand
             {
                 Id = 1,
-                ExternalId = Guid.NewGuid().ToString(),
                 Source = "UnitTest",
                 Title = "The Empire Strikes Back",
                 Director = "Irvin Kershner",
@@ -174,24 +190,9 @@ namespace ConexaTest.Tests.ApplicationTests
         public async Task UpdateMovie_UpdateMovie_ReturnsTrue()
         {
             var dbName = Guid.NewGuid().ToString();
-            var arrangeContext = DbContextFactory.CreateInMemoryDbContext(dbName);            
+            var dbContext = DbContextFactory.CreateInMemoryDbContext(dbName);
             var movie = new Movie
-                {
-                    Title = "The Empire Strikes Back",
-                    Director = "Irvin Kershner",
-                    Producer = "Gary Kurtz",
-                    ReleaseDate = new DateTime(1980, 5, 21),
-                    Description = "Second film in the Star Wars saga.",
-                    EpisodeId = 5
-                };
-
-            arrangeContext.Movies.Add(movie);
-            await arrangeContext.SaveChangesAsync();            
-            using var actContext = DbContextFactory.CreateInMemoryDbContext(dbName);
-            var handler = new UpdateMovieCommandHandler(actContext);
-            var command = new UpdateMovieCommand
             {
-                Id = 1, // el Id que guardaste antes (si es identity empieza en 1)
                 Title = "The Empire Strikes Back",
                 Director = "Irvin Kershner",
                 Producer = "Gary Kurtz",
@@ -200,13 +201,30 @@ namespace ConexaTest.Tests.ApplicationTests
                 EpisodeId = 5
             };
 
+            dbContext.Movies.Add(movie);
+            await dbContext.SaveChangesAsync();
+            var handler = new UpdateMovieCommandHandler(dbContext, _mapper);
+            var command = new UpdateMovieCommand
+            {
+                Id = movie.Id,
+                Title = "The Empire Strikes Back 2",
+                Director = "Irvin Kershner",
+                Producer = "Gary Kurtz",
+                ReleaseDate = new DateTime(1981, 5, 21),
+                Description = "Third film in the Star Wars saga.",
+                EpisodeId = 3
+            };
+
             var result = await handler.Handle(command, CancellationToken.None);
+            var movieUpdated = await dbContext.Movies.FirstOrDefaultAsync(m => m.Id == movie.Id);
 
             Assert.False(result.IsError);
             Assert.True(result.Value);
-
+            Assert.NotNull(movieUpdated);
+            Assert.Equal(movieUpdated.Title, command.Title);
+            Assert.Equal(movieUpdated.ReleaseDate, command.ReleaseDate);
+            Assert.Equal(movieUpdated.EpisodeId, command.EpisodeId);
         }
-
         [Fact]
         public async Task DeleteMovie_DeleteMovieWithInexistentId_ReturnsError()
         {
@@ -220,7 +238,7 @@ namespace ConexaTest.Tests.ApplicationTests
             var result = await handler.Handle(command, CancellationToken.None);
 
             Assert.True(result.IsError);
-            Assert.Equal(MoviesError.NoMovieFound,result.FirstError);
+            Assert.Equal(MoviesError.NoMovieFound, result.FirstError);
         }
         [Fact]
         public async Task DeleteMovie_DeleteExistentMovie_ReturnsTrue()
@@ -248,6 +266,6 @@ namespace ConexaTest.Tests.ApplicationTests
 
             Assert.False(result.IsError);
             Assert.True(result.Value);
-        }        
+        }
     }
 }

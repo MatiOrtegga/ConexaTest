@@ -1,12 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
+﻿
 namespace ConexaTest.Domain.Dto
-{
-    
+{    
     public class UpdateMovieDto
     {
         public int Id { get; set; }
-        public string ExternalId { get; set; } = "";
         public string Source { get; set; } = "Local";
         public string Title { get; set; } = "";
         public string Director { get; set; } = "";

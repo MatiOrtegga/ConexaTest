@@ -1,20 +1,19 @@
-﻿using ConexaTest.Application.Builders;
+﻿using AutoMapper;
 using ConexaTest.Application.Commands.Movies;
 using ConexaTest.Domain.Errors.Movies;
 using ConexaTest.Infrastructure;
 using ErrorOr;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConexaTest.Application.Handlers.Movies.Commands
 {
-    public class UpdateMovieCommandHandler(AppDbContext dbContext) : IRequestHandler<UpdateMovieCommand, ErrorOr<bool>>
+    public class UpdateMovieCommandHandler(AppDbContext dbContext, IMapper mapper) : IRequestHandler<UpdateMovieCommand, ErrorOr<bool>>
     {
         private readonly AppDbContext _dbContext = dbContext;
+        private readonly IMapper mapper = mapper;
         public async Task<ErrorOr<bool>> Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
         {
             var movieInDb = _dbContext.Movies
-                .AsNoTracking()
                 .FirstOrDefault(m => m.Id == request.Id);
 
             if(movieInDb is null)
@@ -22,16 +21,10 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
                 return MoviesError.NoMovieFound;
             }
 
-            var movieToUpdate = new MovieBuilder(request.Title, request.Director, request.Producer)
-                .SetId(request.Id)
-                .SetExternalId(request.ExternalId)
-                .SetSource(request.Source)
-                .SetReleaseDate(request.ReleaseDate.Value)
-                .SetEpisodeId(request.EpisodeId ?? 0)
-                .SetDescription(request.Description ?? "")
-                .Build();            
+            mapper.Map(request, movieInDb);
+            movieInDb.UpdatedAt = DateTime.UtcNow;
 
-            _dbContext.Movies.Update(movieToUpdate);
+            _dbContext.Movies.Update(movieInDb);
             var response = await _dbContext.SaveChangesAsync(cancellationToken);
 
             if (response == 0)

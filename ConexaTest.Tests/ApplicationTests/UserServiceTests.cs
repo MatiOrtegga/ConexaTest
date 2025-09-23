@@ -51,7 +51,7 @@ namespace ConexaTest.Tests.ApplicationTests
             var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
             var handler = new AddUserCommandHandler(fakeDbContext);
 
-            var newRole = new Role { Name = "Admin" };
+            var newRole = new Role { Name = "User" };
             await fakeDbContext.Roles.AddAsync(newRole);
             await fakeDbContext.SaveChangesAsync();
 
@@ -60,7 +60,6 @@ namespace ConexaTest.Tests.ApplicationTests
                 Name = "Test User",
                 Email = "realGmail1234@gmail.com",
                 Password = "Password123!",
-                RoleId = newRole.Id
             };
 
             var result = await handler.Handle(command, CancellationToken.None);
@@ -75,7 +74,7 @@ namespace ConexaTest.Tests.ApplicationTests
             var handler = new ValidateUserQueryHandler(fakeDbContext);
 
             var hasdPassword = BCrypt.Net.BCrypt.HashPassword("Password123!");
-            var newRole = new Role { Name = "Admin" };
+            var newRole = new Role { Name = "User" };
             await fakeDbContext.Roles.AddAsync(newRole);
             await fakeDbContext.SaveChangesAsync();
 
@@ -88,7 +87,6 @@ namespace ConexaTest.Tests.ApplicationTests
 
             var query = new ValidateUserQuery
             {
-                Name = "Test User",
                 Email = "realGmail1234@gmail.com",
                 Password = "Password123!"
             };
@@ -119,7 +117,6 @@ namespace ConexaTest.Tests.ApplicationTests
 
             var query = new ValidateUserQuery
             {
-                Name = "TestUser",
                 Email = "realGmail1234@gmail.com",
                 Password = "Password123!"
             };
