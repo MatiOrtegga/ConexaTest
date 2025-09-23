@@ -1,7 +1,9 @@
 ﻿using ErrorOr;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ConexaTest.Domain.Errors.Movies
 {
+    
     public static class MoviesError
     {
         public static Error NoMovieFound => Error.NotFound(

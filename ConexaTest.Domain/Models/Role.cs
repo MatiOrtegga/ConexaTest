@@ -1,5 +1,8 @@
-﻿namespace ConexaTest.Domain.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace ConexaTest.Domain.Models
 {
+    
     public class Role
     {
         public int Id { get; set; }

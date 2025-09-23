@@ -20,7 +20,6 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
             {
                 var exists = await _dbContext.Movies
                     .AnyAsync(m => m.ExternalId == swapiMovie.Id && m.Source == "SWAPI", cancellationToken: cancellationToken);
-
                 if (!exists)
                 {
                     var movie = new MovieBuilder(swapiMovie.Properties.Title, swapiMovie.Properties.Director, swapiMovie.Properties.Producer)

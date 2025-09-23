@@ -4,6 +4,7 @@ using ConexaTest.Domain.Errors.Movies;
 using ConexaTest.Infrastructure;
 using ErrorOr;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConexaTest.Application.Handlers.Movies.Commands
 {
@@ -12,7 +13,9 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
         private readonly AppDbContext _dbContext = dbContext;
         public async Task<ErrorOr<bool>> Handle(UpdateMovieCommand request, CancellationToken cancellationToken)
         {
-            var movieInDb = _dbContext.Movies.FirstOrDefault(m => m.Id == request.Id);
+            var movieInDb = _dbContext.Movies
+                .AsNoTracking()
+                .FirstOrDefault(m => m.Id == request.Id);
 
             if(movieInDb is null)
             {

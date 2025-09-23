@@ -1,6 +1,9 @@
 ﻿
+using System.Diagnostics.CodeAnalysis;
+
 namespace ConexaTest.Domain.Dto
 {
+    
     public class AddUserDto
     {
         public int RoleId { get; set; }

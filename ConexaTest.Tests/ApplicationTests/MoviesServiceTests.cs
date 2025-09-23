@@ -22,7 +22,7 @@ namespace ConexaTest.Tests.ApplicationTests
             );
             await fakeDbContext.SaveChangesAsync();
 
-            var query = new GetMoviesQuery();         
+            var query = new GetMoviesQuery();
             var result = await handler.Handle(query, CancellationToken.None);
             var movies = result.Value.ToList();
 
@@ -110,12 +110,12 @@ namespace ConexaTest.Tests.ApplicationTests
 
             var command = new AddMovieCommand
             {
-                ExternalId = Guid.NewGuid().ToString(),     
+                ExternalId = Guid.NewGuid().ToString(),
                 Source = "UnitTest",
                 Title = "The Empire Strikes Back",
                 Director = "Irvin Kershner",
                 Producer = "Gary Kurtz",
-                ReleaseDate = new DateTime(1980, 5, 21),   
+                ReleaseDate = new DateTime(1980, 5, 21),
                 Description = "Second film in the Star Wars saga.",
                 EpisodeId = 5
             };
@@ -124,5 +124,130 @@ namespace ConexaTest.Tests.ApplicationTests
             Assert.True(result.IsError);
             Assert.Equal(MoviesError.MovieAlreadyExists, result.FirstError);
         }
+        [Fact]
+        public async Task AddMovie_NewMovie_ReturnsTrue()
+        {
+            var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
+            var handler = new AddMovieCommandHandler(fakeDbContext);
+
+            var command = new AddMovieCommand
+            {
+                ExternalId = Guid.NewGuid().ToString(),
+                Source = "UnitTest",
+                Title = "The Empire Strikes Back",
+                Director = "Irvin Kershner",
+                Producer = "Gary Kurtz",
+                ReleaseDate = new DateTime(1980, 5, 21),
+                Description = "Second film in the Star Wars saga.",
+                EpisodeId = 5
+            };
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            Assert.False(result.IsError);
+            Assert.True(result.Value);
+        }
+
+        [Fact]
+        public async Task UpdateMovie_WithMovieIdInexistent_ReturnsError()
+        {
+            var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
+            var handler = new UpdateMovieCommandHandler(fakeDbContext);
+
+            var command = new UpdateMovieCommand
+            {
+                Id = 1,
+                ExternalId = Guid.NewGuid().ToString(),
+                Source = "UnitTest",
+                Title = "The Empire Strikes Back",
+                Director = "Irvin Kershner",
+                Producer = "Gary Kurtz",
+                ReleaseDate = new DateTime(1980, 5, 21),
+                Description = "Second film in the Star Wars saga.",
+                EpisodeId = 5
+            };
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            Assert.True(result.IsError);
+            Assert.Equal(MoviesError.NoMovieFound, result.FirstError);
+        }
+        [Fact]
+        public async Task UpdateMovie_UpdateMovie_ReturnsTrue()
+        {
+            var dbName = Guid.NewGuid().ToString();
+            var arrangeContext = DbContextFactory.CreateInMemoryDbContext(dbName);            
+            var movie = new Movie
+                {
+                    Title = "The Empire Strikes Back",
+                    Director = "Irvin Kershner",
+                    Producer = "Gary Kurtz",
+                    ReleaseDate = new DateTime(1980, 5, 21),
+                    Description = "Second film in the Star Wars saga.",
+                    EpisodeId = 5
+                };
+
+            arrangeContext.Movies.Add(movie);
+            await arrangeContext.SaveChangesAsync();            
+            using var actContext = DbContextFactory.CreateInMemoryDbContext(dbName);
+            var handler = new UpdateMovieCommandHandler(actContext);
+            var command = new UpdateMovieCommand
+            {
+                Id = 1, // el Id que guardaste antes (si es identity empieza en 1)
+                Title = "The Empire Strikes Back",
+                Director = "Irvin Kershner",
+                Producer = "Gary Kurtz",
+                ReleaseDate = new DateTime(1980, 5, 21),
+                Description = "Second film in the Star Wars saga.",
+                EpisodeId = 5
+            };
+
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            Assert.False(result.IsError);
+            Assert.True(result.Value);
+
+        }
+
+        [Fact]
+        public async Task DeleteMovie_DeleteMovieWithInexistentId_ReturnsError()
+        {
+            var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
+            var handler = new DeleteMovieCommandHandler(fakeDbContext);
+
+            var command = new DeleteMovieCommand
+            {
+                Id = 1
+            };
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            Assert.True(result.IsError);
+            Assert.Equal(MoviesError.NoMovieFound,result.FirstError);
+        }
+        [Fact]
+        public async Task DeleteMovie_DeleteExistentMovie_ReturnsTrue()
+        {
+            var fakeDbContext = DbContextFactory.CreateInMemoryDbContext(Guid.NewGuid().ToString());
+            var handler = new DeleteMovieCommandHandler(fakeDbContext);
+
+            var movie = new Movie
+            {
+                Title = "The Empire Strikes Back",
+                Director = "Irvin Kershner",
+                Producer = "Gary Kurtz",
+                ReleaseDate = new DateTime(1980, 5, 21),
+                Description = "Second film in the Star Wars saga.",
+                EpisodeId = 5
+            };
+            fakeDbContext.Movies.Add(movie);
+            await fakeDbContext.SaveChangesAsync();
+
+            var command = new DeleteMovieCommand
+            {
+                Id = movie.Id
+            };
+            var result = await handler.Handle(command, CancellationToken.None);
+
+            Assert.False(result.IsError);
+            Assert.True(result.Value);
+        }        
     }
 }

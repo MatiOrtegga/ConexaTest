@@ -1,11 +1,14 @@
 ﻿using Newtonsoft.Json;
+using System.Diagnostics.CodeAnalysis;
 namespace ConexaTest.Application.Dtos
 {
+    
     public class SwapiResponse
     {
         [JsonProperty("result")]
         public List<SwapiResult> Result { get; set; }
     }
+    
     public class SwapiResult
     {
         [JsonProperty("properties")]
@@ -17,6 +20,7 @@ namespace ConexaTest.Application.Dtos
         [JsonProperty("description")]
         public string Description { get; set; }
     }
+    
     public class SwapiProperties
     {
         [JsonProperty("title")]

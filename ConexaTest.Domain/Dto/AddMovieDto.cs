@@ -1,5 +1,8 @@
-﻿namespace ConexaTest.Domain.Dto
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace ConexaTest.Domain.Dto
 {
+    
     public class AddMovieDto
     {
         public string ExternalId { get; set; } = "";
