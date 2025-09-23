@@ -32,6 +32,7 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
                     var movie = new Movie
                     {
                         ExternalId = swapiMovie.Id,
+                        Source = "SWAPI",
                         Title = swapiMovie.Properties.Title,
                         Director = swapiMovie.Properties.Director,
                         Producer = swapiMovie.Properties.Producer,
@@ -45,10 +46,10 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
                 else
                 {
                     existingMovie.ExternalId = swapiMovie.Id;
+                    existingMovie.Source = "SWAPI";
                     existingMovie.Title = swapiMovie.Properties.Title;
                     existingMovie.Director = swapiMovie.Properties.Director;
                     existingMovie.Producer = swapiMovie.Properties.Producer;
-                    existingMovie.Source = "SWAPI";
                     existingMovie.ReleaseDate = DateTime.SpecifyKind(DateTime.Parse(swapiMovie.Properties.ReleaseDate), DateTimeKind.Utc);
                     existingMovie.Description = swapiMovie.Description ?? string.Empty;
                     existingMovie.EpisodeId = swapiMovie.Properties.EpisodeId;
