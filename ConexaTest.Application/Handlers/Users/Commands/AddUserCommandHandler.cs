@@ -1,4 +1,5 @@
 ﻿using ConexaTest.Application.Commands.Users;
+using ConexaTest.Domain.Errors.Users;
 using ConexaTest.Domain.Models;
 using ConexaTest.Infrastructure;
 using ErrorOr;
@@ -15,7 +16,12 @@ namespace ConexaTest.Application.Handlers.Users.Commands
             var userWithSameEmail = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
             if (userWithSameEmail != null)
             {
-                return Error.Failure();
+                return UserErrors.EmailAlreadyInUse;
+            }
+
+            if(request.RoleId == 0)
+            {
+                return UserErrors.RoleNotFound;
             }
 
             var newUser = new User
@@ -31,8 +37,7 @@ namespace ConexaTest.Application.Handlers.Users.Commands
 
             if (response == 0)
             {
-                return Error.Failure();
-
+                return UserErrors.CantCreateUser;
             }
             return true;
         }

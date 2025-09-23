@@ -1,4 +1,5 @@
 ﻿using ConexaTest.Application.Queries.Users;
+using ConexaTest.Domain.Errors.Users;
 using ConexaTest.Domain.Models;
 using ConexaTest.Infrastructure;
 using ErrorOr;
@@ -14,18 +15,18 @@ namespace ConexaTest.Application.Handlers.Users.Queries
         {
             var user = await _dbContext.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == request.Email || u.Name == request.Name,cancellationToken);
+                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
             if (user is null)
             {
-                return Error.NotFound("User not found.");
+                return UserErrors.UserNotFound;
             }
 
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
             if (!isPasswordValid)
             {
-                return Error.Validation("Invalid password.");
+                return UserErrors.InvalidCredentials;
             }
 
             return user;
