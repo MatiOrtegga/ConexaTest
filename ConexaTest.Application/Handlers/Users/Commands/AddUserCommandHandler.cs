@@ -18,12 +18,10 @@ namespace ConexaTest.Application.Handlers.Users.Commands
             {
                 return UserErrors.EmailAlreadyInUse;
             }
-
-            if(request.RoleId == 0)
+            if (request.RoleId == 0)
             {
                 return UserErrors.RoleNotFound;
             }
-
             var newUser = new User
             {
                 Name = request.Name,

@@ -24,8 +24,10 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
 
             var movieToUpdate = new MovieBuilder(request.Title, request.Director, request.Producer)
                 .SetId(request.Id)
-                .SetSource("Local")
+                .SetExternalId(request.ExternalId)
+                .SetSource(request.Source)
                 .SetReleaseDate(request.ReleaseDate.Value)
+                .SetEpisodeId(request.EpisodeId ?? 0)
                 .SetDescription(request.Description ?? "")
                 .Build();            
 

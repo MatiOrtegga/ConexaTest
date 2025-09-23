@@ -1,6 +1,7 @@
 ﻿using ConexaTest.Application.Builders;
 using ConexaTest.Application.Commands.Movies;
 using ConexaTest.Application.Services;
+using ConexaTest.Domain.Models;
 using ConexaTest.Infrastructure;
 using ErrorOr;
 using MediatR;
@@ -22,19 +23,30 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
             }
             foreach (var swapiMovie in swapiMovies.Value)
             {
-                var exists = await _dbContext.Movies
-                    .AnyAsync(m => m.ExternalId == swapiMovie.Id && m.Source == "SWAPI", cancellationToken: cancellationToken);
-                if (!exists)
+                var movieExists = await _dbContext.Movies
+                    .FirstOrDefaultAsync(m => m.ExternalId == swapiMovie.Id && m.Source == "SWAPI", cancellationToken);
+
+                if (movieExists is null)
                 {
                     var movie = new MovieBuilder(swapiMovie.Properties.Title, swapiMovie.Properties.Director, swapiMovie.Properties.Producer)
                         .SetExternalId(swapiMovie.Id)
                         .SetSource("SWAPI")
                         .SetReleaseDate(DateTime.SpecifyKind(DateTime.Parse(swapiMovie.Properties.ReleaseDate), DateTimeKind.Utc))
-                        .SetDescription(swapiMovie.Description)
+                        .SetDescription(swapiMovie.Description ?? string.Empty)
                         .SetEpisodeId(swapiMovie.Properties.EpisodeId)
                         .Build();
-
                     _dbContext.Movies.Add(movie);
+                }
+                else
+                {
+                    movieExists.Title = swapiMovie.Properties.Title;
+                    movieExists.Director = swapiMovie.Properties.Director;
+                    movieExists.Producer = swapiMovie.Properties.Producer;
+                    movieExists.ReleaseDate = DateTime.SpecifyKind(DateTime.Parse(swapiMovie.Properties.ReleaseDate), DateTimeKind.Utc);
+                    movieExists.Description = swapiMovie.Description ?? string.Empty;
+                    movieExists.EpisodeId = swapiMovie.Properties.EpisodeId;
+                    movieExists.UpdatedAt = DateTime.UtcNow;
+                    _dbContext.Movies.Update(movieExists);
                 }
             }
             var response = await _dbContext.SaveChangesAsync(cancellationToken);

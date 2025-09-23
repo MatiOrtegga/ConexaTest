@@ -41,7 +41,7 @@ namespace ConexaTest.Controllers
 
             if (result.IsError)
             {
-                return Results.BadRequest(result.FirstError.Description);
+                return Results.BadRequest(result.FirstError);
             }
 
             var token = _manager.GenerateToken(result.Value);

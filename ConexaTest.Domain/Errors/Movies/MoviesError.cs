@@ -13,7 +13,7 @@ namespace ConexaTest.Domain.Errors.Movies
 
         public static Error MovieAlreadyExists => Error.Conflict(
             code: "Movies.MovieAlreadyExists",
-            description: "A movie with the same title and director already exists."
+            description: "A movie with the same title already exists."
         );
         public static Error CantAddMovie => Error.Failure(
             code: "Movies.CantAddMovie",

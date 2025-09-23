@@ -1,4 +1,5 @@
-﻿using ConexaTest.Application.Commands.Movies;
+﻿using Azure;
+using ConexaTest.Application.Commands.Movies;
 using ConexaTest.Application.Queries.Movies;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -18,10 +19,10 @@ namespace ConexaTest.Controllers
 
             if(query.IsError)
             {
-                return Results.Problem(query.FirstError.Description);
+                return Results.BadRequest(query.FirstError);
             }
 
-            if(!query.Value.Any())
+            if (!query.Value.Any())
             {
                 return Results.NoContent();
             }
@@ -39,7 +40,7 @@ namespace ConexaTest.Controllers
 
             if (query.IsError)
             {
-                return Results.Problem(query.FirstError.Description);
+                return Results.BadRequest(query.FirstError);
             }
 
             return Results.Ok(query.Value);
@@ -51,7 +52,7 @@ namespace ConexaTest.Controllers
             var response = await _mediator.Send(command);
             if(response.IsError)
             {
-                return Results.Problem(response.FirstError.Description);
+                return Results.BadRequest(response.FirstError);
             }
 
             return Results.Ok("Movie added succesfully.");
@@ -63,7 +64,7 @@ namespace ConexaTest.Controllers
             var response = await _mediator.Send(new SyncSwapMoviesCommand());
             if (response.IsError)
             {
-                return Results.Problem(response.FirstError.Description);
+                return Results.BadRequest(response.FirstError);
             }
 
             return Results.Ok("Movies Sincronized succesfully.");
@@ -75,7 +76,7 @@ namespace ConexaTest.Controllers
             var response = await _mediator.Send(command);
             if (response.IsError)
             {
-                return Results.Problem(response.FirstError.Description);
+                return Results.BadRequest(response.FirstError);
             }
             return Results.Ok("Movie updated succesfully.");
         }
@@ -89,7 +90,7 @@ namespace ConexaTest.Controllers
             });
             if (response.IsError)
             {
-                return Results.Problem(response.FirstError.Description);
+                return Results.BadRequest(response.FirstError);
             }
             return Results.Ok("Movie deleted succesfully.");
         }
