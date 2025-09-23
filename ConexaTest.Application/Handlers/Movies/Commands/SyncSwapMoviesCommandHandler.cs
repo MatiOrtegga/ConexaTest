@@ -16,7 +16,11 @@ namespace ConexaTest.Application.Handlers.Movies.Commands
         {
             var swapiMovies = await _swapiServices.GetStarWarsMoviesAsync();
 
-            foreach (var swapiMovie in swapiMovies)
+            if(swapiMovies.IsError)
+            {
+                return swapiMovies.FirstError;
+            }
+            foreach (var swapiMovie in swapiMovies.Value)
             {
                 var exists = await _dbContext.Movies
                     .AnyAsync(m => m.ExternalId == swapiMovie.Id && m.Source == "SWAPI", cancellationToken: cancellationToken);
